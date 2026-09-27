@@ -1,0 +1,6 @@
+{
+  "algorithm": "ML-DSA-65",
+  "key_directory": "keys",
+  "signature_extension": ".sig",
+  "default_output_directory": "demo"
+}

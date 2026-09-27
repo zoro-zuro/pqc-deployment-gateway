@@ -1,0 +1,59 @@
+name: PQC Artifact Verification Gate
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  pqc-verify-gate:
+    name: Verify Post-Quantum Signature & Gate Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install PQC Code Signer & Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Run Self-Diagnostics
+        run: |
+          pqc diagnostics
+
+      - name: Execute Full Demo & Functional Evaluation
+        run: |
+          pqc demo
+
+      - name: Verify Simulated Production Artifact
+        id: verify_step
+        run: |
+          echo "=========================================================="
+          echo "Running Post-Quantum Verification Gate (NIST ML-DSA-65)..."
+          echo "=========================================================="
+          # pqc verify exits with code 0 on VALID, code 1 on INVALID
+          pqc verify demo/app.bin --public-key keys/public.key --signature demo/app.bin.sig --json
+
+      - name: Deployment Gate Decision
+        if: success()
+        run: |
+          echo "✓ POST-QUANTUM SIGNATURE VALID."
+          echo "✓ ARTIFACT INTEGRITY CONFIRMED."
+          echo "✓ DEPLOYMENT PROCEEDING TO PRODUCTION HOSTS."
+
+      - name: Deployment Blocked Alert
+        if: failure()
+        run: |
+          echo "✗ SECURITY ALERT: Cryptographic verification failed!"
+          echo "✗ Deployment blocked to protect production infrastructure."
+          exit 1

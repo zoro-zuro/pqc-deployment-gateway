@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pqc-code-signer"
+version = "0.1.0"
+description = "Post-Quantum Cryptography (PQC) Code Signer and Verifier CLI using NIST ML-DSA-65 (CRYSTALS-Dilithium)"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "PQC Research Team" }
+]
+dependencies = [
+    "cryptography>=50.0.0",
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+oqs = [
+    "liboqs-python>=0.10.0",
+]
+
+[project.scripts]
+pqc = "pqc_cli.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pqc_cli*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
